@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Category {
   final String id;
   final String name;
@@ -34,6 +32,5 @@ class Category {
     'color': color,
     'type': type,
     'isDefault': isDefault,
-    'createdAt': FieldValue.serverTimestamp(),
   };
 }
