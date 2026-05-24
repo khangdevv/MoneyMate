@@ -43,3 +43,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# docx
+*.docx
+
+# md
+MoneyMate_DoAn_Flutter_v2.md
+PLAN.md
+
+# html 
+moneymate_pdm_full.html

@@ -6,8 +6,6 @@ class Transaction {
   final double amount;
   final String catId;
   final String note;
-  final bool hasReceipt;
-  final String? receiptUrl;
   final DateTime date;
   final DateTime createdAt;
 
@@ -17,8 +15,6 @@ class Transaction {
     required this.amount,
     required this.catId,
     required this.note,
-    this.hasReceipt = false,
-    this.receiptUrl,
     required this.date,
     required this.createdAt,
   });
@@ -30,8 +26,6 @@ class Transaction {
       amount: (map['amount'] as num?)?.toDouble() ?? 0.0,
       catId: map['catId'] ?? '',
       note: map['note'] ?? '',
-      hasReceipt: map['hasReceipt'] ?? false,
-      receiptUrl: map['receiptUrl'],
       date: map['date'] is Timestamp
           ? (map['date'] as Timestamp).toDate()
           : DateTime.tryParse(map['date']?.toString() ?? '') ?? DateTime.now(),
@@ -47,8 +41,6 @@ class Transaction {
       'amount': amount,
       'catId': catId,
       'note': note,
-      'hasReceipt': hasReceipt,
-      'receiptUrl': receiptUrl,
       'date': Timestamp.fromDate(date),
       'createdAt': Timestamp.fromDate(createdAt),
     };
