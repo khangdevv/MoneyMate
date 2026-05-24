@@ -37,6 +37,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
+      if (!mounted) return;
       final msg = e.toString();
       setState(() {
         if (msg.contains('email-already-in-use')) {

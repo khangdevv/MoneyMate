@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
+import 'providers/category_provider.dart';
 import 'screens/auth/login_screen.dart';
-import 'screens/home_screen.dart';
+import 'screens/main_navigation_shell.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
       ],
       child: MaterialApp(
         title: 'MoneyMate',
@@ -65,9 +67,6 @@ class MyApp extends StatelessWidget {
           ),
         ),
         home: const AuthWrapper(),
-        routes: {
-          '/home': (context) => const HomeScreen(),
-        },
       ),
     );
   }
@@ -79,6 +78,6 @@ class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
-    return auth.isAuthenticated ? const HomeScreen() : const LoginScreen();
+    return auth.isAuthenticated ? const MainNavigationShell() : const LoginScreen();
   }
 }

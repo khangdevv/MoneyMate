@@ -3,8 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
+  final ValueChanged<int> onTap;
+  final VoidCallback onAddTap;
 
-  const BottomNavBar({super.key, required this.currentIndex});
+  const BottomNavBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+    required this.onAddTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,31 +31,39 @@ class BottomNavBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             children: [
-              Expanded(child: _buildNavItem(context,
+              Expanded(
+                child: _buildNavItem(
                   icon: Icons.home_outlined,
                   activeIcon: Icons.home_rounded,
                   label: 'Trang chủ',
                   index: 0,
-                  route: '/home')),
-              Expanded(child: _buildNavItem(context,
+                ),
+              ),
+              Expanded(
+                child: _buildNavItem(
                   icon: Icons.category_outlined,
                   activeIcon: Icons.category_rounded,
                   label: 'Danh mục',
                   index: 1,
-                  route: '/categories')),
-              const SizedBox(width: 56),
-              Expanded(child: _buildNavItem(context,
-                  icon: Icons.bar_chart_outlined,
-                  activeIcon: Icons.bar_chart_rounded,
-                  label: 'Thống kê',
+                ),
+              ),
+              if (currentIndex == 0) _buildAddButton(),
+              Expanded(
+                child: _buildNavItem(
+                  icon: Icons.assessment_outlined,
+                  activeIcon: Icons.assessment_rounded,
+                  label: 'Báo cáo',
                   index: 2,
-                  route: '/statistics')),
-              Expanded(child: _buildNavItem(context,
+                ),
+              ),
+              Expanded(
+                child: _buildNavItem(
                   icon: Icons.person_outline,
                   activeIcon: Icons.person_rounded,
                   label: 'Tài khoản',
                   index: 3,
-                  route: '/profile')),
+                ),
+              ),
             ],
           ),
         ),
@@ -56,22 +71,18 @@ class BottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(
-    BuildContext context, {
+  Widget _buildNavItem({
     required IconData icon,
     required IconData activeIcon,
     required String label,
     required int index,
-    required String route,
   }) {
     final isActive = currentIndex == index;
     return GestureDetector(
-      onTap: () {
-        if (!isActive) Navigator.pushReplacementNamed(context, route);
-      },
+      onTap: () => onTap(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
           color: isActive
               ? const Color(0xFF6C63FF).withValues(alpha: 0.1)
@@ -81,16 +92,40 @@ class BottomNavBar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(isActive ? activeIcon : icon,
-                color: isActive ? const Color(0xFF6C63FF) : Colors.grey[500],
-                size: 24),
+            Icon(
+              isActive ? activeIcon : icon,
+              color: isActive ? const Color(0xFF6C63FF) : Colors.grey[500],
+              size: 24,
+            ),
             const SizedBox(height: 4),
-            Text(label,
-                style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                    color: isActive ? const Color(0xFF6C63FF) : Colors.grey[500])),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                color: isActive ? const Color(0xFF6C63FF) : Colors.grey[500],
+              ),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: InkWell(
+        onTap: onAddTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: const Color(0xFF6C63FF),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
     );
