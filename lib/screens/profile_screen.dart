@@ -77,13 +77,6 @@ class ProfileScreen extends StatelessWidget {
             title: 'Tiền tệ',
             subtitle: 'VND — Việt Nam Đồng',
           ),
-          const SizedBox(height: 10),
-          _tile(
-            icon: Icons.info_outline_rounded,
-            color: const Color(0xFF4ECDC4),
-            title: 'Phiên bản',
-            subtitle: '1.0.0',
-          ),
           const SizedBox(height: 32),
           SizedBox(
             width: double.infinity,

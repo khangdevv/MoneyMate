@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/category_provider.dart';
+import '../providers/transaction_provider.dart';
 import '../widgets/bottom_nav_bar.dart';
 import '../widgets/add_transaction_sheet.dart';
 import 'home_screen.dart';
 import 'category_screen.dart';
 import 'profile_screen.dart';
-import 'report_screen.dart';
+import 'history_screen.dart';
 
 class MainNavigationShell extends StatefulWidget {
   const MainNavigationShell({super.key});
@@ -24,6 +25,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     super.initState();
     final uid = context.read<AuthProvider>().user!.uid;
     context.read<CategoryProvider>().init(uid);
+    context.read<TransactionProvider>().init(uid);
   }
 
   void _showAddTransaction() {
@@ -37,11 +39,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   @override
   Widget build(BuildContext context) {
-    final screens = <Widget>[
-      const HomeScreen(),
-      const CategoryScreen(),
-      const ReportScreen(),
-      const ProfileScreen(),
+    const screens = <Widget>[
+      HomeScreen(),
+      CategoryScreen(),
+      HistoryScreen(),
+      ProfileScreen(),
     ];
 
     return Scaffold(
@@ -52,8 +54,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
-        onAddTap: _showAddTransaction,
       ),
+      floatingActionButton: (_currentIndex == 3 || _currentIndex == 2)
+          ? null
+          : FloatingActionButton(
+              onPressed: _showAddTransaction,
+              backgroundColor: const Color(0xFF6C63FF),
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
     );
   }
 }
