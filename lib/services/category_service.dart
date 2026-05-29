@@ -23,6 +23,16 @@ class CategoryService {
         .add(category.toMap());
   }
 
+  Future<void> updateCategory(
+      String uid, String categoryId, Map<String, dynamic> data) async {
+    await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('categories')
+        .doc(categoryId)
+        .update(data);
+  }
+
   Future<void> deleteCategory(String uid, String categoryId) async {
     await _firestore
         .collection('users')

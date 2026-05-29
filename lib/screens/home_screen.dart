@@ -5,10 +5,22 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/category_provider.dart';
 import '../providers/transaction_provider.dart';
+import '../providers/budget_provider.dart';
+import '../widgets/add_transaction_sheet.dart';
+import '../widgets/balance_item.dart';
 import 'history_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  void _showAddTransaction(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const AddTransactionSheet(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,16 +29,23 @@ class HomeScreen extends StatelessWidget {
     final now = DateTime.now();
     final txProvider = context.watch<TransactionProvider>();
     final catMap = context.watch<CategoryProvider>().categoryMap;
-    final currencyFormat =
-        NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+    final bgProvider = context.watch<BudgetProvider>();
+    final currencyFormat =NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 
     final income = txProvider.monthlyIncome(now.year, now.month);
     final expense = txProvider.monthlyExpense(now.year, now.month);
     final balance = income - expense;
     final recentTxs = txProvider.transactions.take(10).toList();
+    final budget = bgProvider.budgetLimit(now.year, now.month);
+    final isOverBudget = budget > 0 && expense > budget;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddTransaction(context),
+        backgroundColor: const Color(0xFF6C63FF),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -76,6 +95,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
+            !isOverBudget ?
             // Balance Card
             SliverToBoxAdapter(
               child: Padding(
@@ -110,7 +130,7 @@ class HomeScreen extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: _BalanceItem(
+                            child: BalanceItem(
                               icon: Icons.arrow_upward_rounded,
                               label: 'Thu nhập',
                               amount: currencyFormat.format(income),
@@ -122,7 +142,65 @@ class HomeScreen extends StatelessWidget {
                             color: Colors.white.withValues(alpha: 0.2),
                           ),
                           Expanded(
-                            child: _BalanceItem(
+                            child: BalanceItem(
+                              icon: Icons.arrow_downward_rounded,
+                              label: 'Chi tiêu',
+                              amount: currencyFormat.format(expense),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
+            : SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 243, 108, 84),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 255, 122, 99).withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Text('Số dư tháng ${now.month}/${now.year}',
+                          style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: 0.8))),
+                      const SizedBox(height: 8),
+                      Text(currencyFormat.format(balance),
+                          style: GoogleFonts.poppins(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: BalanceItem(
+                              icon: Icons.arrow_upward_rounded,
+                              label: 'Thu nhập',
+                              amount: currencyFormat.format(income),
+                            ),
+                          ),
+                          Container(
+                            width: 1,
+                            height: 40,
+                            color: Colors.white.withValues(alpha: 0.2),
+                          ),
+                          Expanded(
+                            child: BalanceItem(
                               icon: Icons.arrow_downward_rounded,
                               label: 'Chi tiêu',
                               amount: currencyFormat.format(expense),
@@ -287,46 +365,5 @@ class HomeScreen extends StatelessWidget {
     } catch (_) {
       return Colors.grey;
     }
-  }
-}
-
-class _BalanceItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String amount;
-
-  const _BalanceItem(
-      {required this.icon, required this.label, required this.amount});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: Colors.white, size: 18),
-        ),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label,
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.8))),
-            Text(amount,
-                style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white)),
-          ],
-        ),
-      ],
-    );
   }
 }

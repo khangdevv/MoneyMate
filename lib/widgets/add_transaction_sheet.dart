@@ -186,8 +186,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet>
           color: const Color(0xFF2D3436)));
 }
 
-// ─── Private widgets tightly coupled với sheet ───────────────────────────────
-
+// Private widgets tightly coupled với sheet 
 class _TypeTabBar extends StatelessWidget {
   final TabController controller;
   const _TypeTabBar({required this.controller});

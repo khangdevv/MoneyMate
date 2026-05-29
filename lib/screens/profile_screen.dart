@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import 'category_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -60,17 +59,6 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 32),
-          _tile(
-            icon: Icons.category_rounded,
-            color: const Color(0xFF6C63FF),
-            title: 'Danh mục',
-            subtitle: 'Quản lý danh mục chi tiêu & thu nhập',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const CategoryScreen()),
-            ),
-          ),
-          const SizedBox(height: 10),
           _tile(
             icon: Icons.currency_exchange_rounded,
             color: const Color(0xFF6AB1FF),

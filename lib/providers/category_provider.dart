@@ -37,6 +37,22 @@ class CategoryProvider with ChangeNotifier {
     await _service.addCategory(uid, category);
   }
 
+  Future<void> updateCategory(
+    String uid,
+    String categoryId,
+    String name,
+    String emoji,
+    String color,
+    String type,
+  ) async {
+    await _service.updateCategory(uid, categoryId, {
+      'name': name,
+      'emoji': emoji,
+      'color': color,
+      'type': type,
+    });
+  }
+
   Future<void> removeCategory(String uid, String categoryId) async {
     await _service.deleteCategory(uid, categoryId);
   }

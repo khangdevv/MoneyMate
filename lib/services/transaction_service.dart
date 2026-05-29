@@ -23,6 +23,15 @@ class TransactionService {
         .add(tx.toMap());
   }
 
+  Future<void> updateTransaction(String uid, Transaction tx, String txId) {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('transactions')
+        .doc(txId)
+        .update(tx.toMap());
+  }
+
   Future<void> deleteTransaction(String uid, String txId) {
     return _db
         .collection('users')

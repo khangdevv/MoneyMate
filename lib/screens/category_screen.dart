@@ -23,8 +23,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
     '✈️', '🍿', '📚', '🎁', '🎵', '🐶', '🏋️', '💻',
   ];
   static const _colorList = [
-    '#FF6B6B', '#4ECDC4', '#FFD93D', '#6AB1FF',
-    '#4CAF50', '#9B59B6', '#E67E22', '#95A5A6',
+    '#FF6B6B',
+    '#4ECDC4',
+    '#FFD93D',
+    '#6AB1FF',
+    '#4CAF50',
+    '#9B59B6',
+    '#E67E22',
+    '#95A5A6',
   ];
 
   @override
@@ -33,19 +39,27 @@ class _CategoryScreenState extends State<CategoryScreen> {
     super.dispose();
   }
 
-  void _showAddDialog() {
-    _nameController.clear();
-    _selectedEmoji = '🍔';
-    _selectedColor = '#FF6B6B';
-    _selectedType = 'expense';
+  void _showCategoryDialog({Category? category}) {
+    if (category?.isDefault ?? false) return;
+
+    final editingCategory = category;
+    final isEditing = editingCategory != null;
+    _nameController.text = editingCategory?.name ?? '';
+    _selectedEmoji = editingCategory?.emoji ?? '🍔';
+    _selectedColor = editingCategory?.color ?? '#FF6B6B';
+    _selectedType = editingCategory?.type ?? 'expense';
 
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text('Thêm danh mục',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            isEditing ? 'Sửa danh mục' : 'Thêm danh mục',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -67,12 +81,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       onTap: () => setDialogState(() => _selectedType = type),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? (type == 'expense'
-                                  ? const Color(0xFFFF6B6B)
-                                  : const Color(0xFF4CAF50))
+                                    ? const Color(0xFFFF6B6B)
+                                    : const Color(0xFF4CAF50))
                               : Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -88,9 +104,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   }).toList(),
                 ),
                 const SizedBox(height: 16),
-                Text('Chọn Emoji',
-                    style: GoogleFonts.poppins(
-                        fontSize: 13, fontWeight: FontWeight.w500)),
+                Text(
+                  'Chọn Emoji',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 6,
@@ -98,8 +118,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   children: _emojiList.map((emoji) {
                     final isSelected = _selectedEmoji == emoji;
                     return GestureDetector(
-                      onTap: () =>
-                          setDialogState(() => _selectedEmoji = emoji),
+                      onTap: () => setDialogState(() => _selectedEmoji = emoji),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -109,30 +128,38 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           borderRadius: BorderRadius.circular(8),
                           border: isSelected
                               ? Border.all(
-                                  color: const Color(0xFF6C63FF), width: 1.5)
+                                  color: const Color(0xFF6C63FF),
+                                  width: 1.5,
+                                )
                               : null,
                         ),
-                        child: Text(emoji,
-                            style: const TextStyle(fontSize: 20)),
+                        child: Text(
+                          emoji,
+                          style: const TextStyle(fontSize: 20),
+                        ),
                       ),
                     );
                   }).toList(),
                 ),
                 const SizedBox(height: 16),
-                Text('Chọn màu sắc',
-                    style: GoogleFonts.poppins(
-                        fontSize: 13, fontWeight: FontWeight.w500)),
+                Text(
+                  'Chọn màu sắc',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
                   children: _colorList.map((hex) {
-                    final color =
-                        Color(int.parse(hex.replaceFirst('#', '0xFF')));
+                    final color = Color(
+                      int.parse(hex.replaceFirst('#', '0xFF')),
+                    );
                     final isSelected = _selectedColor == hex;
                     return GestureDetector(
-                      onTap: () =>
-                          setDialogState(() => _selectedColor = hex),
+                      onTap: () => setDialogState(() => _selectedColor = hex),
                       child: Container(
                         width: 34,
                         height: 34,
@@ -144,8 +171,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               : null,
                         ),
                         child: isSelected
-                            ? const Icon(Icons.check,
-                                color: Colors.white, size: 18)
+                            ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 18,
+                              )
                             : null,
                       ),
                     );
@@ -157,26 +187,47 @@ class _CategoryScreenState extends State<CategoryScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text('Hủy',
-                  style: GoogleFonts.poppins(color: Colors.grey)),
+              child: Text(
+                'Hủy',
+                style: GoogleFonts.poppins(color: Colors.grey),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6C63FF),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: () async {
                 final name = _nameController.text.trim();
                 if (name.isEmpty) return;
                 final uid = context.read<AuthProvider>().user!.uid;
                 final catProvider = context.read<CategoryProvider>();
-                await catProvider.createCategory(
-                    uid, name, _selectedEmoji, _selectedColor, _selectedType);
+                if (editingCategory != null) {
+                  await catProvider.updateCategory(
+                    uid,
+                    editingCategory.id,
+                    name,
+                    _selectedEmoji,
+                    _selectedColor,
+                    _selectedType,
+                  );
+                } else {
+                  await catProvider.createCategory(
+                    uid,
+                    name,
+                    _selectedEmoji,
+                    _selectedColor,
+                    _selectedType,
+                  );
+                }
                 if (mounted) Navigator.pop(ctx);
               },
-              child: Text('Thêm',
-                  style: GoogleFonts.poppins(color: Colors.white)),
+              child: Text(
+                isEditing ? 'Lưu thay đổi' : 'Thêm',
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -196,13 +247,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text('Danh mục',
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF2D3436))),
+        title: Text(
+          'Danh mục',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF2D3436),
+          ),
+        ),
         actions: [
           IconButton(
-            onPressed: _showAddDialog,
+            onPressed: () => _showCategoryDialog(),
             icon: const Icon(Icons.add, color: Color(0xFF6C63FF)),
           ),
         ],
@@ -212,11 +266,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircularProgressIndicator(
-                      color: Color(0xFF6C63FF)),
+                  const CircularProgressIndicator(color: Color(0xFF6C63FF)),
                   const SizedBox(height: 12),
-                  Text('Đang tải danh mục...',
-                      style: GoogleFonts.poppins(color: Colors.grey)),
+                  Text(
+                    'Đang tải danh mục...',
+                    style: GoogleFonts.poppins(color: Colors.grey),
+                  ),
                 ],
               ),
             )
@@ -224,15 +279,21 @@ class _CategoryScreenState extends State<CategoryScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 if (expense.isNotEmpty) ...[
-                  _sectionHeader('Chi tiêu', Icons.arrow_upward_rounded,
-                      const Color(0xFFFF6B6B)),
+                  _sectionHeader(
+                    'Chi tiêu',
+                    Icons.arrow_upward_rounded,
+                    const Color(0xFFFF6B6B),
+                  ),
                   const SizedBox(height: 8),
                   ...expense.map((cat) => _categoryTile(cat, uid)),
                   const SizedBox(height: 16),
                 ],
                 if (income.isNotEmpty) ...[
-                  _sectionHeader('Thu nhập', Icons.arrow_downward_rounded,
-                      const Color(0xFF4CAF50)),
+                  _sectionHeader(
+                    'Thu nhập',
+                    Icons.arrow_downward_rounded,
+                    const Color(0xFF4CAF50),
+                  ),
                   const SizedBox(height: 8),
                   ...income.map((cat) => _categoryTile(cat, uid)),
                 ],
@@ -246,11 +307,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
       children: [
         Icon(icon, color: color, size: 18),
         const SizedBox(width: 6),
-        Text(title,
-            style: GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF2D3436))),
+        Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF2D3436),
+          ),
+        ),
       ],
     );
   }
@@ -264,14 +328,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2)),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         leading: Container(
           width: 46,
           height: 46,
@@ -280,31 +344,49 @@ class _CategoryScreenState extends State<CategoryScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
-              child: Text(cat.emoji,
-                  style: const TextStyle(fontSize: 22))),
+            child: Text(cat.emoji, style: const TextStyle(fontSize: 22)),
+          ),
         ),
-        title: Text(cat.name,
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF2D3436))),
+        title: Text(
+          cat.name,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF2D3436),
+          ),
+        ),
         trailing: cat.isDefault
             ? Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text('Mặc định',
-                    style: GoogleFonts.poppins(
-                        fontSize: 11, color: Colors.grey[600])),
+                child: Text(
+                  'Mặc định',
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: Colors.grey[600],
+                  ),
+                ),
               )
             : IconButton(
-                icon: const Icon(Icons.delete_outline,
-                    color: Colors.redAccent, size: 22),
-                onPressed: () =>
-                    context.read<CategoryProvider>().removeCategory(uid, cat.id),
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.redAccent,
+                  size: 22,
+                ),
+                onPressed: () => context
+                    .read<CategoryProvider>()
+                    .removeCategory(uid, cat.id),
               ),
+        onTap: cat.isDefault
+            ? null
+            : () {
+                _showCategoryDialog(category: cat);
+              },
       ),
     );
   }

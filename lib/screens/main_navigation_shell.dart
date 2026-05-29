@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:moneymate/providers/budget_provider.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/category_provider.dart';
 import '../providers/transaction_provider.dart';
 import '../widgets/bottom_nav_bar.dart';
-import '../widgets/add_transaction_sheet.dart';
 import 'home_screen.dart';
 import 'category_screen.dart';
 import 'profile_screen.dart';
@@ -26,15 +26,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     final uid = context.read<AuthProvider>().user!.uid;
     context.read<CategoryProvider>().init(uid);
     context.read<TransactionProvider>().init(uid);
-  }
-
-  void _showAddTransaction() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const AddTransactionSheet(),
-    );
+    context.read<BudgetProvider>().init(uid);
   }
 
   @override
@@ -55,13 +47,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
       ),
-      floatingActionButton: (_currentIndex == 3 || _currentIndex == 2)
-          ? null
-          : FloatingActionButton(
-              onPressed: _showAddTransaction,
-              backgroundColor: const Color(0xFF6C63FF),
-              child: const Icon(Icons.add, color: Colors.white),
-            ),
     );
   }
 }
