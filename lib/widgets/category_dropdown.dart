@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/category.dart';
+import 'category_icon_badge.dart';
 
 class CategoryDropdown extends StatelessWidget {
   final List<Category> categories;
@@ -56,7 +57,7 @@ class CategoryDropdown extends StatelessWidget {
             value: cat,
             child: Row(
               children: [
-                _CategoryIcon(emoji: cat.emoji, color: color, size: 36),
+                CategoryIconBadge(emoji: cat.emoji, color: color, size: 36),
                 const SizedBox(width: 12),
                 Text(cat.name,
                     style: GoogleFonts.poppins(
@@ -71,7 +72,7 @@ class CategoryDropdown extends StatelessWidget {
           final color = _hexToColor(cat.color);
           return Row(
             children: [
-              _CategoryIcon(emoji: cat.emoji, color: color, size: 32),
+              CategoryIconBadge(emoji: cat.emoji, color: color, size: 32),
               const SizedBox(width: 10),
               Text(cat.name,
                   style: GoogleFonts.poppins(
@@ -92,30 +93,5 @@ class CategoryDropdown extends StatelessWidget {
     } catch (_) {
       return Colors.grey;
     }
-  }
-}
-
-class _CategoryIcon extends StatelessWidget {
-  final String emoji;
-  final Color color;
-  final double size;
-
-  const _CategoryIcon(
-      {required this.emoji, required this.color, required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(size * 0.28),
-      ),
-      child: Center(
-        child: Text(emoji,
-            style: TextStyle(fontSize: size * 0.5)),
-      ),
-    );
   }
 }

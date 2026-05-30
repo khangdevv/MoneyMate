@@ -7,7 +7,10 @@ import '../providers/category_provider.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/budget_provider.dart';
 import '../widgets/add_transaction_sheet.dart';
+import '../widgets/app_card.dart';
 import '../widgets/balance_item.dart';
+import '../widgets/empty_state.dart';
+import '../widgets/transaction_tile.dart';
 import 'history_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -38,6 +41,7 @@ class HomeScreen extends StatelessWidget {
     final recentTxs = txProvider.transactions.take(10).toList();
     final budget = bgProvider.budgetLimit(now.year, now.month);
     final isOverBudget = budget > 0 && expense > budget;
+    final overBudgetAmount = expense - budget;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -184,6 +188,13 @@ class HomeScreen extends StatelessWidget {
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
+                      const SizedBox(height: 12),
+                      Text('Vượt ngân sách ${currencyFormat.format(overBudgetAmount)}',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white)),
                       const SizedBox(height: 24),
                       Row(
                         children: [
@@ -247,27 +258,12 @@ class HomeScreen extends StatelessWidget {
                 ? SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 32),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.receipt_long_outlined,
-                                size: 48, color: Colors.grey.shade300),
-                            const SizedBox(height: 12),
-                            Text('Chưa có giao dịch nào',
-                                style: GoogleFonts.poppins(
-                                    color: Colors.grey.shade400,
-                                    fontWeight: FontWeight.w500)),
-                            const SizedBox(height: 4),
-                            Text('Nhấn + để thêm giao dịch đầu tiên',
-                                style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade400)),
-                          ],
+                      child: const AppCard(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: EmptyState(
+                          icon: Icons.receipt_long_outlined,
+                          title: 'Chưa có giao dịch nào',
+                          subtitle: 'Nhấn + để thêm giao dịch đầu tiên',
                         ),
                       ),
                     ),
@@ -279,74 +275,13 @@ class HomeScreen extends StatelessWidget {
                         (context, index) {
                           final tx = recentTxs[index];
                           final cat = catMap[tx.catId];
-                          final isIncome = tx.type == 'income';
-                          final catColor = _hexToColor(cat?.color ?? '#95A5A6');
 
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.04),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2))
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    color: catColor.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Center(
-                                    child: Text(cat?.emoji ?? '💸',
-                                        style:
-                                            const TextStyle(fontSize: 22)),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(cat?.name ?? 'Khác',
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color:
-                                                  const Color(0xFF2D3436))),
-                                      if (tx.note.isNotEmpty) ...[
-                                        const SizedBox(height: 2),
-                                        Text(tx.note,
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 12,
-                                                color: Colors.grey[500]),
-                                            maxLines: 1,
-                                            overflow:
-                                                TextOverflow.ellipsis),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                                Text(
-                                  '${isIncome ? '+' : '-'}${currencyFormat.format(tx.amount)}',
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: isIncome
-                                          ? const Color(0xFF4ECDC4)
-                                          : const Color(0xFFFF6B6B)),
-                                ),
-                              ],
-                            ),
+                          return TransactionTile(
+                            tx: tx,
+                            categoryEmoji: cat?.emoji ?? '💸',
+                            categoryName: cat?.name ?? 'Khác',
+                            categoryColor: cat?.color ?? '#95A5A6',
+                            currencyFormat: currencyFormat,
                           );
                         },
                         childCount: recentTxs.length,
@@ -359,11 +294,4 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Color _hexToColor(String hex) {
-    try {
-      return Color(int.parse(hex.replaceFirst('#', '0xFF')));
-    } catch (_) {
-      return Colors.grey;
-    }
-  }
 }

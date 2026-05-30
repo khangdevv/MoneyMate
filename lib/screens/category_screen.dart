@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../models/category.dart';
 import '../providers/auth_provider.dart';
 import '../providers/category_provider.dart';
+import '../widgets/app_card.dart';
+import '../widgets/category_icon_badge.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -321,31 +323,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   Widget _categoryTile(Category cat, String uid) {
     final color = Color(int.parse(cat.color.replaceFirst('#', '0xFF')));
-    return Container(
+    return AppCard(
       margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: Container(
-          width: 46,
-          height: 46,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Center(
-            child: Text(cat.emoji, style: const TextStyle(fontSize: 22)),
-          ),
+        leading: CategoryIconBadge(
+          emoji: cat.emoji,
+          color: color,
+          size: 46,
+          alpha: 0.12,
         ),
         title: Text(
           cat.name,

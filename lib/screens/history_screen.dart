@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/category_provider.dart';
 import '../providers/transaction_provider.dart';
+import '../widgets/empty_state.dart';
+import '../widgets/summary_chip.dart';
+import '../widgets/transaction_tile.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -65,31 +68,41 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
             child: Row(
               children: [
-                _SummaryChip(
-                  label: 'Thu',
-                  amount: txProvider.monthlyIncome(
-                    _selectedYear,
-                    _selectedMonth,
+                Expanded(
+                  child: SummaryChip(
+                    label: 'Thu',
+                    amount: txProvider.monthlyIncome(
+                      _selectedYear,
+                      _selectedMonth,
+                    ),
+                    color: const Color(0xFF4ECDC4),
+                    currencyFormat: currencyFormat,
                   ),
-                  color: const Color(0xFF4ECDC4),
-                  currencyFormat: currencyFormat,
                 ),
                 const SizedBox(width: 12),
-                _SummaryChip(
-                  label: 'Chi',
-                  amount: txProvider.monthlyExpense(
-                    _selectedYear,
-                    _selectedMonth,
+                Expanded(
+                  child: SummaryChip(
+                    label: 'Chi',
+                    amount: txProvider.monthlyExpense(
+                      _selectedYear,
+                      _selectedMonth,
+                    ),
+                    color: const Color(0xFFFF6B6B),
+                    currencyFormat: currencyFormat,
                   ),
-                  color: const Color(0xFFFF6B6B),
-                  currencyFormat: currencyFormat,
                 ),
               ],
             ),
           ),
           Expanded(
             child: transactions.isEmpty
-                ? _EmptyState(month: _selectedMonth, year: _selectedYear)
+                ? Center(
+                    child: EmptyState(
+                      icon: Icons.receipt_long_outlined,
+                      title: 'Không có giao dịch',
+                      subtitle: 'tháng $_selectedMonth/$_selectedYear',
+                    ),
+                  )
                 : ListView.builder(
                     padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
                     itemCount: transactions.length,
@@ -155,12 +168,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 tx.id,
                               );
                         },
-                        child: _TransactionTile(
+                        child: TransactionTile(
                           tx: tx,
-                          catEmoji: cat?.emoji ?? '💸',
-                          catName: cat?.name ?? 'Khác',
-                          catColor: cat?.color ?? '#95A5A6',
+                          categoryEmoji: cat?.emoji ?? '💸',
+                          categoryName: cat?.name ?? 'Khác',
+                          categoryColor: cat?.color ?? '#95A5A6',
                           currencyFormat: currencyFormat,
+                          showDate: true,
                         ),
                       );
                     },
@@ -226,202 +240,6 @@ class _MonthDropdown extends StatelessWidget {
         onChanged: (d) {
           if (d != null) onChanged(d.month, d.year);
         },
-      ),
-    );
-  }
-}
-
-class _SummaryChip extends StatelessWidget {
-  final String label;
-  final double amount;
-  final Color color;
-  final NumberFormat currencyFormat;
-
-  const _SummaryChip({
-    required this.label,
-    required this.amount,
-    required this.color,
-    required this.currencyFormat,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: color,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              currencyFormat.format(amount),
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: color,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TransactionTile extends StatelessWidget {
-  final dynamic tx;
-  final String catEmoji;
-  final String catName;
-  final String catColor;
-  final NumberFormat currencyFormat;
-
-  const _TransactionTile({
-    required this.tx,
-    required this.catEmoji,
-    required this.catName,
-    required this.catColor,
-    required this.currencyFormat,
-  });
-
-  Color _hexToColor(String hex) {
-    try {
-      return Color(int.parse(hex.replaceFirst('#', '0xFF')));
-    } catch (_) {
-      return Colors.grey;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _hexToColor(catColor);
-    final isIncome = tx.type == 'income';
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(catEmoji, style: const TextStyle(fontSize: 22)),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  catName,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2D3436),
-                  ),
-                ),
-                if (tx.note.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    tx.note,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-                const SizedBox(height: 2),
-                Text(
-                  DateFormat('d/M/yyyy').format(tx.date),
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    color: Colors.grey[400],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            '${isIncome ? '+' : '-'}${currencyFormat.format(tx.amount)}',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: isIncome
-                  ? const Color(0xFF4ECDC4)
-                  : const Color(0xFFFF6B6B),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  final int month;
-  final int year;
-
-  const _EmptyState({required this.month, required this.year});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.receipt_long_outlined,
-            size: 60,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Không có giao dịch',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey.shade400,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'tháng $month/$year',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              color: Colors.grey.shade400,
-            ),
-          ),
-        ],
       ),
     );
   }
